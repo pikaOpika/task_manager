@@ -1,5 +1,40 @@
 {% extends "base.html" %}
 
-{% block content %}
+{% block title %}Home — Task Manager{% endblock %}
 
-{% endblock  %}
+{% block content %}
+<div class="jumbotron">
+    <h1 class="display-4">Welcome to Task Manager</h1>
+    <p class="lead">Manage your team's tasks, track deadlines, and boost productivity.</p>
+    <hr class="my-4">
+    <div class="row mt-4">
+        <div class="col-md-4">
+            <div class="card text-center mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">📋 Tasks</h5>
+                    <p class="card-text">Create and track tasks with priorities and deadlines.</p>
+                    <a href="" class="btn btn-primary">View Tasks</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-center mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">👥 Workers</h5>
+                    <p class="card-text">See your team members and their positions.</p>
+                    <a href="" class="btn btn-primary">View Workers</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-center mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">🏷️ Task Types</h5>
+                    <p class="card-text">Organize tasks by type: Bug, Feature, QA and more.</p>
+                    <a href="#" class="btn btn-primary">View Types</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

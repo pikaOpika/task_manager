@@ -13,12 +13,12 @@
         <div class="ml-auto">
             {% if user.is_authenticated %}
                 <span class="text-white mr-3">{{ user.username }}</span>
-                <form method="post" action="" class="d-inline">
+                <form method="post" action="{% url "logout" %}" class="d-inline">
                     {% csrf_token %}
                     <button type="submit" class="btn btn-outline-light btn-sm">Logout</button>
                 </form>
             {% else %}
-                <a href="{% url 'login' %}" class="btn btn-outline-light btn-sm">Login</a>
+                <a href="{% url "login" %}" class="btn btn-outline-light btn-sm">Login</a>
             {% endif %}
         </div>
     </nav>
