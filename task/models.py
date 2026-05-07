@@ -36,8 +36,8 @@ class Task(models.Model):
         max_length=100,
     )
     description = models.TextField()
-    deadline = models.DateTimeField()
-    is_completed = models.BooleanField()
+    deadline = models.DateField()
+    is_completed = models.BooleanField(default=False)
     priority = models.CharField(
         max_length=30,
         choices=Choices, default=Choices.low
@@ -47,13 +47,19 @@ class Task(models.Model):
         related_name="tasks",
         null=True, blank=True
     )
-    assignes = models.ManyToManyField(
+    assignees = models.ManyToManyField(
         settings.AUTH_USER_MODEL,
         related_name="tasks"
     )
 
+    def __str__(self):
+        return self.name
+
 class Worker(AbstractUser):
     position = models.ForeignKey(
-        Position, related_name="workers", on_delete=models.CASCADE
+        Position, related_name="workers", on_delete=models.CASCADE,
+        null=True, blank=True,
     )
 
+    def __str__(self):
+        return f"{self.username} {self.position}"
