@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}{{ task.name }} — Task Manager{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+        <h4 class="mb-0">{{ task.name }}</h4>
+        <div>
+            <a href="{% url 'task:task-update' task.id %}" class="btn btn-sm btn-outline-light mr-2">Edit</a>
+            <a href="{% url 'task:task-delete' task.id %}" class="btn btn-sm btn-outline-danger">Delete</a>
+        </div>
+    </div>
+    <div class="card-body">
+        <p><strong>Description:</strong> {{ task.description }}</p>
+        <p><strong>Deadline:</strong> {{ task.deadline }}</p>
+        <p><strong>Priority:</strong> {{ task.get_priority_display }}</p>
+        <p><strong>Type:</strong> {{ task.task_type }}</p>
+        <p>
+            <strong>Status:</strong>
+            {% if task.is_completed %}
+                <span class="badge badge-success">Completed</span>
+            {% else %}
+                <span class="badge badge-warning">In Progress</span>
+            {% endif %}
+        </p>
+
+        <h5 class="mt-4">Assignees:</h5>
+        <ul class="list-group mb-3">
+            {% for worker in task.assignees.all %}
+            <li class="list-group-item">{{ worker.username }} — {{ worker.position }}</li>
+            {% empty %}
+            <li class="list-group-item text-muted">No assignees yet.</li>
+            {% endfor %}
+        </ul>
+
+        <form method="post">
+            {% csrf_token %}
+            {% if user in task.assignees.all %}
+            <button type="submit" name="action" value="remove" class="btn btn-danger">Remove me from task</button>
+            {% else %}
+            <button type="submit" name="action" value="assign" class="btn btn-success">Assign me to task</button>
+            {% endif %}
+        </form>
+    </div>
+</div>
+{% endblock %}
