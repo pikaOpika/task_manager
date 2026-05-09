@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.views import generic
 from django.urls import reverse, reverse_lazy
 
@@ -25,8 +25,16 @@ class TaskListView(generic.ListView):
 class TaskDetailView(generic.DetailView):
     model = Task
 
+    def post(self, request, *args, **kwargs):
+        obj = self.get_object()
+        action = self.request.POST.get("action")
+        if action == "assign":
+            obj.assignees.add(self.request.user)
+        else:
+            obj.assignees.remove(self.request.user)
+        return redirect("task:task-detail", pk=obj.id)
+
 class TaskCreateView(generic.CreateView):
     model = Task
-    fields = ["name", "description", "deadline", "priority",
-              "task_type", "assignees"]
+    fields = "__all__"
     success_url = reverse_lazy("task:task-list")
