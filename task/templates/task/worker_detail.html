@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}{{ object.username }} — Task Manager{% endblock %}
+
+{% block content %}
+<div class="card mb-4">
+    <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+        <h4 class="mb-0">{{ object.get_full_name|default:object.username }}</h4>
+        <a href="" class="btn btn-sm btn-outline-light">Edit</a>
+    </div>
+    <div class="card-body">
+        <p><strong>Username:</strong> {{ object.username }}</p>
+        <p><strong>Email:</strong> {{ object.email }}</p>
+        <p><strong>Position:</strong> {{ object.position }}</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-warning">
+                <h5 class="mb-0">In Progress ({{ in_progress.count }})</h5>
+            </div>
+            <ul class="list-group list-group-flush">
+                {% for task in in_progress %}
+                <li class="list-group-item">
+                    <a href="{% url 'task:task-detail' task.id %}">{{ task.name }}</a>
+                    <small class="text-muted d-block">Deadline: {{ task.deadline }}</small>
+                </li>
+                {% empty %}
+                <li class="list-group-item text-muted">No tasks in progress.</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">Completed ({{ completed.count }})</h5>
+            </div>
+            <ul class="list-group list-group-flush">
+                {% for task in completed %}
+                <li class="list-group-item">
+                    <a href="{% url 'task:task-detail' task.id %}">{{ task.name }}</a>
+                    <small class="text-muted d-block">Deadline: {{ task.deadline }}</small>
+                </li>
+                {% empty %}
+                <li class="list-group-item text-muted">No completed tasks.</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

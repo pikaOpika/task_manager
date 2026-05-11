@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.views import generic
 from django.urls import reverse, reverse_lazy
+from django.contrib.auth import get_user_model
 
 from .models import Task
 
@@ -38,3 +39,27 @@ class TaskCreateView(generic.CreateView):
     model = Task
     fields = "__all__"
     success_url = reverse_lazy("task:task-list")
+
+class TaskUpdateView(generic.UpdateView):
+    model = Task
+    fields = "__all__"
+
+    def get_success_url(self):
+        task = self.get_object()
+        return reverse_lazy("task:task-detail", args=[task.id,])
+
+class TaskDeleteView(generic.DeleteView):
+    model = Task
+    success_url = reverse_lazy("task:task-list")
+
+class WorkerListView(generic.ListView):
+    model = get_user_model()
+
+    def get_queryset(self):
+        return super().get_queryset()
+
+
+class WorkerDetailView(generic.DetailView):
+    model = get_user_model()
+
+

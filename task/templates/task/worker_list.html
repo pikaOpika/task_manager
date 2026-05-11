@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}Workers — Task Manager{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Workers</h1>
+    <a href="" class="btn btn-success">+ New Worker</a>
+</div>
+
+<div class="row">
+    {% for worker in worker_list %}
+    <div class="col-md-4 mb-3">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <a href="{% url "task:worker-detail" worker.id %}">{{ worker.username }}</a>
+                </h5>
+                <p class="text-muted mb-1">{{ worker.get_full_name }}</p>
+                <p class="mb-1"><strong>Position:</strong> {{ worker.position }}</p>
+                <p class="mb-0">
+                    <span class="badge badge-primary">{{ worker.tasks.count }} tasks</span>
+                </p>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12 text-muted text-center">No workers found.</div>
+    {% endfor %}
+</div>
+{% endblock %}
