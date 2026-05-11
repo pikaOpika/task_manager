@@ -4,6 +4,7 @@ from django.urls import reverse, reverse_lazy
 from django.contrib.auth import get_user_model
 
 from .models import Task
+from .forms import WorkerForm
 
 # Create your views here.
 def index(request):
@@ -34,6 +35,8 @@ class TaskDetailView(generic.DetailView):
         else:
             obj.assignees.remove(self.request.user)
         return redirect("task:task-detail", pk=obj.id)
+    
+    
 
 class TaskCreateView(generic.CreateView):
     model = Task
@@ -56,10 +59,21 @@ class WorkerListView(generic.ListView):
     model = get_user_model()
 
     def get_queryset(self):
-        return super().get_queryset()
+        queryset = super().get_queryset().prefetch_related("tasks").select_related("position")
+        return queryset
 
 
 class WorkerDetailView(generic.DetailView):
     model = get_user_model()
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["completed"] = self.object.tasks.filter(is_completed=True)
+        context["in_progress"] = self.object.tasks.filter(is_completed=False)
+        return context
 
+
+class WorkerCreateView(generic.CreateView):
+    model = get_user_model()
+    form_class = WorkerForm
+    success_url = reverse_lazy("task:index")
