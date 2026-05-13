@@ -7,6 +7,7 @@ class TaskAdmin(admin.ModelAdmin):
     list_display = ["name", "deadline", "priority", "task_type", "is_completed",]
     search_fields = ["name",]
     list_filter = ["priority", "is_completed",]
+    exclude = ["slug"]
 
 
 @admin.register(TaskType)

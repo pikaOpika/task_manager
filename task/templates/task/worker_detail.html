@@ -6,7 +6,9 @@
 <div class="card mb-4">
     <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
         <h4 class="mb-0">{{ object.get_full_name|default:object.username }}</h4>
+        {% if object.id == user.id %}
         <a href="" class="btn btn-sm btn-outline-light">Edit</a>
+        {% endif %}
     </div>
     <div class="card-body">
         <p><strong>Username:</strong> {{ object.username }}</p>
@@ -24,7 +26,7 @@
             <ul class="list-group list-group-flush">
                 {% for task in in_progress %}
                 <li class="list-group-item">
-                    <a href="{% url 'task:task-detail' task.id %}">{{ task.name }}</a>
+                    <a href="{% url 'task:task-detail' task.slug %}">{{ task.name }}</a>
                     <small class="text-muted d-block">Deadline: {{ task.deadline }}</small>
                 </li>
                 {% empty %}
@@ -41,7 +43,7 @@
             <ul class="list-group list-group-flush">
                 {% for task in completed %}
                 <li class="list-group-item">
-                    <a href="{% url 'task:task-detail' task.id %}">{{ task.name }}</a>
+                    <a href="{% url 'task:task-detail' task.slug %}">{{ task.name }}</a>
                     <small class="text-muted d-block">Deadline: {{ task.deadline }}</small>
                 </li>
                 {% empty %}

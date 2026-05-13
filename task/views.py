@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.views import generic
 from django.urls import reverse, reverse_lazy
 from django.contrib.auth import get_user_model
+from django.contrib.auth import login
 
 from .models import Task
 from .forms import WorkerForm
@@ -26,6 +27,8 @@ class TaskListView(generic.ListView):
 
 class TaskDetailView(generic.DetailView):
     model = Task
+    slug_field = "slug"
+    slug_url_kwarg = "slug"
 
     def post(self, request, *args, **kwargs):
         obj = self.get_object()
@@ -34,26 +37,32 @@ class TaskDetailView(generic.DetailView):
             obj.assignees.add(self.request.user)
         else:
             obj.assignees.remove(self.request.user)
-        return redirect("task:task-detail", pk=obj.id)
+        return redirect("task:task-detail", slug=obj.slug)
     
     
 
 class TaskCreateView(generic.CreateView):
     model = Task
-    fields = "__all__"
+    fields = ["name", "description", "deadline", "priority", "task_type", "assignees"]
+    exclude = ["slug"]
     success_url = reverse_lazy("task:task-list")
 
 class TaskUpdateView(generic.UpdateView):
     model = Task
-    fields = "__all__"
+    fields = ["name", "description", "deadline", "priority", "task_type", "assignees"]
+    exclude = ["slug"]
+    slug_url_kwarg = "slug"
+    slug_field = "slug"
 
     def get_success_url(self):
         task = self.get_object()
-        return reverse_lazy("task:task-detail", args=[task.id,])
+        return reverse_lazy("task:task-detail", kwargs={"slug": task.slug})
 
 class TaskDeleteView(generic.DeleteView):
     model = Task
     success_url = reverse_lazy("task:task-list")
+    slug_url_kwarg = "slug"
+    slug_field = "slug"
 
 class WorkerListView(generic.ListView):
     model = get_user_model()
@@ -65,6 +74,8 @@ class WorkerListView(generic.ListView):
 
 class WorkerDetailView(generic.DetailView):
     model = get_user_model()
+    slug_field = "slug"
+    slug_url_kwarg = "slug"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -77,3 +88,11 @@ class WorkerCreateView(generic.CreateView):
     model = get_user_model()
     form_class = WorkerForm
     success_url = reverse_lazy("task:index")
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        login(self.request, form.instance)
+        return response
+    
+
+

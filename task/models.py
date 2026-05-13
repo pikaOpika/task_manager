@@ -1,5 +1,7 @@
+import uuid
+
 from django.db import models
-from django.db.models import Index
+from django.utils.text import slugify
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 
@@ -51,6 +53,12 @@ class Task(models.Model):
         settings.AUTH_USER_MODEL,
         related_name="tasks"
     )
+    slug = models.SlugField(unique=True)
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(f"{self.name}-{uuid.uuid4().hex[:8]}")
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name
@@ -60,6 +68,13 @@ class Worker(AbstractUser):
         Position, related_name="workers", on_delete=models.CASCADE,
         null=True, blank=True,
     )
+    image = models.ImageField(upload_to="user_photo", null=True, blank=True)
+    slug = models.SlugField(unique=True)
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.username)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.username} {self.position}"

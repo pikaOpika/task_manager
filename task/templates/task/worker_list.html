@@ -14,7 +14,7 @@
         <div class="card h-100">
             <div class="card-body">
                 <h5 class="card-title">
-                    <a href="{% url "task:worker-detail" worker.id %}">{{ worker.username }}</a>
+                    <a href="{% url "task:worker-detail" worker.slug %}">{{ worker.username }}</a>
                 </h5>
                 <p class="text-muted mb-1">{{ worker.get_full_name }}</p>
                 <p class="mb-1"><strong>Position:</strong> {{ worker.position }}</p>
