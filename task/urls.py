@@ -18,5 +18,5 @@ urlpatterns = [
     path('tasks/delete/<slug:slug>/', TaskDeleteView.as_view(), name="task-delete"),
     path('tasks/<slug:slug>/', TaskDetailView.as_view(), name="task-detail"),
     path('workers/', WorkerListView.as_view(), name="worker-list"),
-    path('workers/<slug:slug>', WorkerDetailView.as_view(), name="worker-detail")
+    path('workers/<slug:slug>/', WorkerDetailView.as_view(), name="worker-detail")
 ]

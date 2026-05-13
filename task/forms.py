@@ -8,4 +8,4 @@ class WorkerForm(UserCreationForm):
     position = forms.ModelChoiceField(queryset=Position.objects.all())
     class Meta(UserCreationForm.Meta):
         model = get_user_model()
-        fields = UserCreationForm.Meta.fields + ("position",)
+        fields = UserCreationForm.Meta.fields + ("position", "image")
