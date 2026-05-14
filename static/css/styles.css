@@ -1,0 +1,199 @@
+/* static/task/css/styles.css */
+
+:root {
+    --bg-primary: #0f0f1a;
+    --bg-secondary: #1a1a2e;
+    --bg-card: #16213e;
+    --accent: #e94560;
+    --accent-hover: #ff6b6b;
+    --text-primary: #e0e0e0;
+    --text-muted: #8892a4;
+    --border: #0f3460;
+}
+
+body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Navbar */
+.navbar {
+    background-color: var(--bg-secondary) !important;
+    border-bottom: 2px solid var(--accent);
+    padding: 12px 20px;
+}
+
+.navbar-brand {
+    color: var(--accent) !important;
+    font-size: 1.4rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.navbar-brand:hover {
+    color: var(--accent-hover) !important;
+}
+
+/* Cards */
+.card {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+}
+
+.card-header {
+    background-color: var(--bg-secondary) !important;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-primary) !important;
+    font-weight: 600;
+}
+
+/* Buttons */
+.btn-primary {
+    background-color: var(--accent);
+    border-color: var(--accent);
+}
+
+.btn-primary:hover {
+    background-color: var(--accent-hover);
+    border-color: var(--accent-hover);
+}
+
+.btn-success {
+    background-color: #2ecc71;
+    border-color: #2ecc71;
+}
+
+.btn-outline-secondary {
+    color: var(--text-muted);
+    border-color: var(--border);
+}
+
+.btn-outline-secondary:hover,
+.btn-outline-secondary.active {
+    background-color: var(--accent);
+    border-color: var(--accent);
+    color: white;
+}
+
+/* List group */
+.list-group-item {
+    background-color: var(--bg-card);
+    border-color: var(--border);
+    color: var(--text-primary);
+    transition: all 0.2s ease;
+}
+
+.list-group-item:hover,
+.list-group-item-action:hover {
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+    border-left: 3px solid var(--accent);
+    padding-left: 17px;
+}
+
+/* Badges */
+.badge-primary {
+    background-color: #0f3460;
+}
+
+.badge-success {
+    background-color: #1a6b3c;
+}
+
+.badge-warning {
+    background-color: #7d5a00;
+    color: #ffd700;
+}
+
+.badge-danger {
+    background-color: #6b1a1a;
+    color: #ff6b6b;
+}
+
+/* Forms */
+.form-control {
+    background-color: var(--bg-secondary);
+    border-color: var(--border);
+    color: var(--text-primary);
+}
+
+.form-control:focus {
+    background-color: var(--bg-secondary);
+    border-color: var(--accent);
+    color: var(--text-primary);
+    box-shadow: 0 0 0 0.2rem rgba(233, 69, 96, 0.25);
+}
+
+/* Tables */
+table {
+    color: var(--text-primary);
+}
+
+/* Jumbotron */
+.jumbotron {
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    border-left: 4px solid var(--accent);
+}
+
+/* Pagination */
+.page-link {
+    background-color: var(--bg-card);
+    border-color: var(--border);
+    color: var(--text-primary);
+}
+
+.page-link:hover {
+    background-color: var(--accent);
+    border-color: var(--accent);
+    color: white;
+}
+
+.page-item.active .page-link {
+    background-color: var(--accent);
+    border-color: var(--accent);
+}
+
+.page-item.disabled .page-link {
+    background-color: var(--bg-secondary);
+    color: var(--text-muted);
+}
+
+/* Headings */
+h1, h2, h3, h4, h5 {
+    color: var(--text-primary);
+}
+
+/* Links */
+a {
+    color: var(--accent);
+}
+
+a:hover {
+    color: var(--accent-hover);
+    text-decoration: none;
+}
+
+/* Select */
+select {
+    background-color: var(--bg-secondary) !important;
+    color: var(--text-primary) !important;
+    border-color: var(--border) !important;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-primary);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--accent);
+    border-radius: 3px;
+}
