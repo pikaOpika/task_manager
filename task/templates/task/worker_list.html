@@ -1,31 +1,36 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}Workers — Task Manager{% endblock %}
 
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1>Workers</h1>
-    <a href="{% url "task:worker-create" %}" class="btn btn-success">+ New Worker</a>
+    <a href="{% url 'task:worker-create' %}" class="btn btn-success">+ New Worker</a>
 </div>
 
-<div class="row">
+<div class="list-group">
     {% for worker in worker_list %}
-    <div class="col-md-4 mb-3">
-        <div class="card h-100">
-            <div class="card-body">
-                <h5 class="card-title">
-                    <a href="{% url "task:worker-detail" worker.slug %}">{{ worker.username }}</a>
-                </h5>
-                <p class="text-muted mb-1">{{ worker.get_full_name }}</p>
-                <p class="mb-1"><strong>Position:</strong> {{ worker.position }}</p>
-                <p class="mb-0">
-                    <span class="badge badge-primary">{{ worker.tasks.count }} tasks</span>
-                </p>
+    <a href="{% url 'task:worker-detail' worker.slug %}" class="list-group-item list-group-item-action">
+        <div class="d-flex align-items-center">
+            <img 
+                src="{% if worker.image %}{{ worker.image.url }}{% else %}{% static 'images/profile.png' %}{% endif %}" 
+                alt="{{ worker.username }}"
+                class="rounded-circle mr-3"
+                style="width: 60px; height: 60px; object-fit: cover;"
+            >
+            <div class="flex-grow-1">
+                <h5 class="mb-1">{{ worker.username }}</h5>
+                <small class="text-muted">{{ worker.position }}</small>
+            </div>
+            <div class="text-right">
+                <span class="badge badge-primary mr-1">{{ worker.tasks.count }} tasks</span>
+                <span class="badge badge-success">{{ worker.completed_count }} done</span>
             </div>
         </div>
-    </div>
+    </a>
     {% empty %}
-    <div class="col-12 text-muted text-center">No workers found.</div>
+    <div class="list-group-item text-muted text-center">No workers found.</div>
     {% endfor %}
 </div>
 {% endblock %}

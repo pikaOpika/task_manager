@@ -56,8 +56,9 @@ class Task(models.Model):
     slug = models.SlugField(unique=True)
 
     def save(self, *args, **kwargs):
+        slugify_name = slugify(f"task-{uuid.uuid4().hex[:8]}")
         if not self.slug:
-            self.slug = slugify(f"{self.name}-{uuid.uuid4().hex[:8]}")
+            self.slug = slugify_name
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -72,8 +73,9 @@ class Worker(AbstractUser):
     slug = models.SlugField(unique=True)
 
     def save(self, *args, **kwargs):
-        if not self.slug:
-            self.slug = slugify(self.username)
+        slugify_username = slugify(self.username)
+        if not self.slug or self.slug != slugify_username:
+            self.slug = slugify_username
         super().save(*args, **kwargs)
 
     def __str__(self):

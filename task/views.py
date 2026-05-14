@@ -3,9 +3,11 @@ from django.views import generic
 from django.urls import reverse, reverse_lazy
 from django.contrib.auth import get_user_model
 from django.contrib.auth import login
+from django.core.exceptions import PermissionDenied
+from django.db.models import Count, Q
 
 from .models import Task
-from .forms import WorkerForm
+from .forms import WorkerForm, WorkerUpdateForm
 
 # Create your views here.
 def index(request):
@@ -49,14 +51,13 @@ class TaskCreateView(generic.CreateView):
 
 class TaskUpdateView(generic.UpdateView):
     model = Task
-    fields = ["name", "description", "deadline", "priority", "task_type", "assignees"]
+    fields = ["name", "description", "deadline", "is_completed", "priority", "task_type", "assignees"]
     exclude = ["slug"]
     slug_url_kwarg = "slug"
     slug_field = "slug"
 
     def get_success_url(self):
-        task = self.get_object()
-        return reverse_lazy("task:task-detail", kwargs={"slug": task.slug})
+        return reverse_lazy("task:task-detail", kwargs={"slug": self.object.slug})
 
 class TaskDeleteView(generic.DeleteView):
     model = Task
@@ -68,8 +69,10 @@ class WorkerListView(generic.ListView):
     model = get_user_model()
 
     def get_queryset(self):
-        queryset = super().get_queryset().prefetch_related("tasks").select_related("position")
+        queryset = super().get_queryset().prefetch_related("tasks").select_related("position")\
+        .annotate(completed_count=Count("tasks", filter=Q(tasks__is_completed=True)))
         return queryset
+    
 
 
 class WorkerDetailView(generic.DetailView):
@@ -95,4 +98,15 @@ class WorkerCreateView(generic.CreateView):
         return response
     
 
+class WorkerUpdateView(generic.UpdateView):
+    model = get_user_model()
+    form_class = WorkerUpdateForm
 
+    def get_object(self, queryset = None):
+        obj = super().get_object(queryset)
+        if obj != self.request.user:
+            raise PermissionDenied
+        return obj
+    
+    def get_success_url(self):
+        return reverse_lazy("task:worker-detail", kwargs={"slug": self.object.slug})
