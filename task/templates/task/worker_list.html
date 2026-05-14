@@ -4,23 +4,49 @@
 {% block title %}Workers — Task Manager{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
+<div class="d-flex justify-content-between align-items-center mb-3">
     <h1>Workers</h1>
-    <a href="{% url 'task:worker-create' %}" class="btn btn-success">+ New Worker</a>
+    <div class="d-flex align-items-center">
+        <form method="get" class="mr-3">
+            <div class="input-group">
+                <input type="text" name="username" value="{{ request.GET.username }}" 
+                       class="form-control" placeholder="Search by username...">
+                <div class="input-group-append">
+                    <button type="submit" class="btn btn-primary">Search</button>
+                </div>
+            </div>
+        </form>
+        <a href="{% url 'task:worker-create' %}" class="btn btn-success">+ New Worker</a>
+    </div>
 </div>
 
-<div class="list-group">
+<!-- Filter by position -->
+<div class="mb-3">
+    <a href="{% url 'task:worker-list' %}" 
+       class="btn btn-sm btn-outline-secondary mr-1 {% if not request.GET.position %}active{% endif %}">
+        All
+    </a>
+    {% for position in position_list %}
+    <a href="?position={{ position.name }}" 
+       class="btn btn-sm btn-outline-secondary mr-1 {% if request.GET.position == position.name %}active{% endif %}">
+        {{ position.name }}
+    </a>
+    {% endfor %}
+</div>
+
+<!-- Workers list -->
+<div class="list-group mb-3">
     {% for worker in worker_list %}
     <a href="{% url 'task:worker-detail' worker.slug %}" class="list-group-item list-group-item-action">
         <div class="d-flex align-items-center">
-            <img 
-                src="{% if worker.image %}{{ worker.image.url }}{% else %}{% static 'images/profile.png' %}{% endif %}" 
+            <img
+                src="{% if worker.image %}{{ worker.image.url }}{% else %}{% static 'images/profile.png' %}{% endif %}"
                 alt="{{ worker.username }}"
                 class="rounded-circle mr-3"
-                style="width: 60px; height: 60px; object-fit: cover;"
+                style="width: 50px; height: 50px; object-fit: cover;"
             >
             <div class="flex-grow-1">
-                <h5 class="mb-1">{{ worker.username }}</h5>
+                <h5 class="mb-0">{{ worker.username }}</h5>
                 <small class="text-muted">{{ worker.position }}</small>
             </div>
             <div class="text-right">
@@ -33,4 +59,7 @@
     <div class="list-group-item text-muted text-center">No workers found.</div>
     {% endfor %}
 </div>
+
+{% include "includes/pagination.html" %}
+
 {% endblock %}

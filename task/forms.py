@@ -14,3 +14,6 @@ class WorkerUpdateForm(forms.ModelForm):
     class Meta:
         model = get_user_model()
         fields = ["username", "position", "image"]
+
+class WorkerSearchForm(forms.Form):
+    username = forms.CharField(required=False, max_length=100, label="")

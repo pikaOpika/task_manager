@@ -6,8 +6,8 @@ from django.contrib.auth import login
 from django.core.exceptions import PermissionDenied
 from django.db.models import Count, Q
 
-from .models import Task
-from .forms import WorkerForm, WorkerUpdateForm
+from .models import Task, Position
+from .forms import WorkerForm, WorkerUpdateForm, WorkerSearchForm
 
 # Create your views here.
 def index(request):
@@ -71,8 +71,20 @@ class WorkerListView(generic.ListView):
     def get_queryset(self):
         queryset = super().get_queryset().prefetch_related("tasks").select_related("position")\
         .annotate(completed_count=Count("tasks", filter=Q(tasks__is_completed=True)))
+        req = self.request.GET
+        username = req.get("username")
+        position = req.get("position")
+        if username:
+            queryset = queryset.filter(username__icontains=username)
+        if position:
+            queryset = queryset.filter(position__name__icontains=position)
         return queryset
     
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["search_form"] = WorkerSearchForm(self.request.GET)
+        context["position_list"] = Position.objects.all()
+        return context
 
 
 class WorkerDetailView(generic.DetailView):
