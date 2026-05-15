@@ -1,8 +1,8 @@
 from django.shortcuts import render, redirect
 from django.views import generic
-from django.urls import reverse, reverse_lazy
-from django.contrib.auth import get_user_model
-from django.contrib.auth import login
+from django.urls import reverse_lazy
+from django.contrib.auth import get_user_model, login
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.db.models import Count, Q
 
@@ -11,10 +11,18 @@ from .forms import WorkerForm, WorkerUpdateForm, WorkerSearchForm
 
 # Create your views here.
 def index(request):
-    return render(request, "task/index.html")
+    context = {
+        "stats": [
+            ("12k+", "Active users"),
+            ("340k", "Tasks completed"),
+            ("98%", "Satisfaction"),
+        ]
+    }
+    return render(request, "task/index.html", context=context)
 
 class TaskListView(generic.ListView):
     model = Task
+    paginate_by = 5
 
     def get_queryset(self):
         queryset = Task.objects.all()
@@ -27,7 +35,7 @@ class TaskListView(generic.ListView):
             queryset = queryset.filter(assignees=user)
         return queryset
 
-class TaskDetailView(generic.DetailView):
+class TaskDetailView(LoginRequiredMixin, generic.DetailView):
     model = Task
     slug_field = "slug"
     slug_url_kwarg = "slug"
@@ -43,13 +51,13 @@ class TaskDetailView(generic.DetailView):
     
     
 
-class TaskCreateView(generic.CreateView):
+class TaskCreateView(LoginRequiredMixin, generic.CreateView):
     model = Task
     fields = ["name", "description", "deadline", "priority", "task_type", "assignees"]
     exclude = ["slug"]
     success_url = reverse_lazy("task:task-list")
 
-class TaskUpdateView(generic.UpdateView):
+class TaskUpdateView(LoginRequiredMixin, generic.UpdateView):
     model = Task
     fields = ["name", "description", "deadline", "is_completed", "priority", "task_type", "assignees"]
     exclude = ["slug"]
@@ -59,7 +67,7 @@ class TaskUpdateView(generic.UpdateView):
     def get_success_url(self):
         return reverse_lazy("task:task-detail", kwargs={"slug": self.object.slug})
 
-class TaskDeleteView(generic.DeleteView):
+class TaskDeleteView(LoginRequiredMixin, generic.DeleteView):
     model = Task
     success_url = reverse_lazy("task:task-list")
     slug_url_kwarg = "slug"
@@ -67,6 +75,7 @@ class TaskDeleteView(generic.DeleteView):
 
 class WorkerListView(generic.ListView):
     model = get_user_model()
+    paginate_by = 3
 
     def get_queryset(self):
         queryset = super().get_queryset().prefetch_related("tasks").select_related("position")\
@@ -87,7 +96,7 @@ class WorkerListView(generic.ListView):
         return context
 
 
-class WorkerDetailView(generic.DetailView):
+class WorkerDetailView(LoginRequiredMixin, generic.DetailView):
     model = get_user_model()
     slug_field = "slug"
     slug_url_kwarg = "slug"
@@ -110,7 +119,7 @@ class WorkerCreateView(generic.CreateView):
         return response
     
 
-class WorkerUpdateView(generic.UpdateView):
+class WorkerUpdateView(LoginRequiredMixin, generic.UpdateView):
     model = get_user_model()
     form_class = WorkerUpdateForm
 

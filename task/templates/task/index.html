@@ -1,40 +1,162 @@
 {% extends "base.html" %}
+{% load static %}
 
-{% block title %}Home — Task Manager{% endblock %}
+{% block title %}TaskFlow — Manage tasks, ship projects faster{% endblock %}
 
 {% block content %}
-<div class="jumbotron">
-    <h1 class="display-4">Welcome to Task Manager</h1>
-    <p class="lead">Manage your team's tasks, track deadlines, and boost productivity.</p>
-    <hr class="my-4">
-    <div class="row mt-4">
-        <div class="col-md-4">
-            <div class="card text-center mb-3">
-                <div class="card-body">
-                    <h5 class="card-title">📋 Tasks</h5>
-                    <p class="card-text">Create and track tasks with priorities and deadlines.</p>
-                    <a href="{% url "task:task-list" %}" class="btn btn-primary">View Tasks</a>
+
+<!-- Hero -->
+<div class="jumbotron text-center mb-4">
+    <span class="badge px-3 py-2 mb-3 d-inline-block" style="background:#0f3460; color:#e94560; border-radius:20px;">
+        Now with team workspaces
+    </span>
+    <h1 class="display-4 font-weight-bold">
+        Manage tasks, <span style="color:#e94560;">ship projects faster</span>
+    </h1>
+    <p class="lead" style="color:#8892a4;">Organize your team, track progress, and deliver results — all in one place.</p>
+    <div class="mt-4">
+        <a href="{% url 'task:worker-create' %}" class="btn btn-primary btn-lg mr-3">Start for free</a>
+        <a href="{% url 'task:task-list' %}" class="btn btn-outline-secondary btn-lg">See how it works</a>
+    </div>
+</div>
+
+<!-- Stats -->
+<div class="row mb-4">
+    {% for stat, label in stats %}
+    <div class="col-md-4 mb-3">
+        <div class="card text-center py-3">
+            <h3 style="color:#e94560;" class="font-weight-bold">{{ stat }}</h3>
+            <small style="color:#8892a4;">{{ label }}</small>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Kanban preview -->
+<div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center" style="background:#1a1a2e;">
+        <span class="font-weight-bold">Sprint board — example</span>
+        <small style="color:#8892a4;">3 columns · 7 tasks</small>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-4">
+                <small class="text-uppercase font-weight-bold mb-2 d-block" style="color:#8892a4;">
+                    <span style="color:#9b59b6;">●</span> To Do
+                </small>
+                <div class="list-group">
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>Fix login bug</span>
+                        <div>
+                            <span class="badge badge-primary mr-1">Urgent</span>
+                            <span class="rounded-circle d-inline-flex align-items-center justify-content-center" style="width:28px;height:28px;background:#0f3460;font-size:11px;">JD</span>
+                        </div>
+                    </div>
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>Update readme</span>
+                        <div>
+                            <span class="badge badge-primary mr-1">Low</span>
+                            <span class="rounded-circle d-inline-flex align-items-center justify-content-center" style="width:28px;height:28px;background:#0f3460;font-size:11px;">AK</span>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card text-center mb-3">
-                <div class="card-body">
-                    <h5 class="card-title">👥 Workers</h5>
-                    <p class="card-text">See your team members and their positions.</p>
-                    <a href="{% url "task:worker-list" %}" class="btn btn-primary">View Workers</a>
+            <div class="col-md-4">
+                <small class="text-uppercase font-weight-bold mb-2 d-block" style="color:#8892a4;">
+                    <span style="color:#f39c12;">●</span> In Progress
+                </small>
+                <div class="list-group">
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>Dashboard redesign</span>
+                        <div>
+                            <span class="badge badge-warning mr-1">High</span>
+                            <span class="rounded-circle d-inline-flex align-items-center justify-content-center" style="width:28px;height:28px;background:#0f3460;font-size:11px;">MR</span>
+                        </div>
+                    </div>
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>API integration</span>
+                        <div>
+                            <span class="badge badge-warning mr-1">High</span>
+                            <span class="rounded-circle d-inline-flex align-items-center justify-content-center" style="width:28px;height:28px;background:#0f3460;font-size:11px;">SK</span>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card text-center mb-3">
-                <div class="card-body">
-                    <h5 class="card-title">🏷️ Task Types</h5>
-                    <p class="card-text">Organize tasks by type: Bug, Feature, QA and more.</p>
-                    <a href="#" class="btn btn-primary">View Types</a>
+            <div class="col-md-4">
+                <small class="text-uppercase font-weight-bold mb-2 d-block" style="color:#8892a4;">
+                    <span style="color:#2ecc71;">●</span> Done
+                </small>
+                <div class="list-group">
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>Setup CI/CD</span>
+                        <div>
+                            <span class="badge badge-success mr-1">Done</span>
+                            <span class="rounded-circle d-inline-flex align-items-center justify-content-center" style="width:28px;height:28px;background:#0f3460;font-size:11px;">JD</span>
+                        </div>
+                    </div>
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>Write unit tests</span>
+                        <div>
+                            <span class="badge badge-success mr-1">Done</span>
+                            <span class="rounded-circle d-inline-flex align-items-center justify-content-center" style="width:28px;height:28px;background:#0f3460;font-size:11px;">AK</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<!-- Why TaskFlow -->
+<div class="mb-4">
+    <h5 class="text-uppercase font-weight-bold mb-3" style="color:#8892a4;">Why TaskFlow</h5>
+    <div class="row">
+        <div class="col-md-3 mb-3">
+            <div class="card h-100">
+                <div class="card-header">✅ Smart tasks</div>
+                <div class="card-body"><p style="color:#8892a4;">Set priorities, deadlines and track every task with ease.</p></div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card h-100">
+                <div class="card-header">👥 Team workspaces</div>
+                <div class="card-body"><p style="color:#8892a4;">Collaborate with your team in shared workspaces.</p></div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card h-100">
+                <div class="card-header">📈 Progress tracking</div>
+                <div class="card-body"><p style="color:#8892a4;">Visual boards and reports to keep your team on track.</p></div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card h-100">
+                <div class="card-header">⚡ Fast by default</div>
+                <div class="card-body"><p style="color:#8892a4;">Keyboard shortcuts and a clean interface built for speed.</p></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- CTA -->
+<div class="jumbotron text-center mb-4">
+    <h2>Ready to get organized?</h2>
+    <p style="color:#8892a4;">Create your free account — no credit card needed.</p>
+    <div class="input-group col-md-6 mx-auto">
+        <div class="input-group-append">
+            <a href="{% url 'task:worker-create' %}" class="btn btn-primary">Sign up</a>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer class="d-flex justify-content-between align-items-center py-3 mt-4" style="border-top: 1px solid #0f3460; background:#1a1a2e; margin: 0 -15px; padding: 0 15px;">
+    <small style="color:#8892a4;">TaskFlow 2025</small>
+    <div>
+        <a href="#" class="mr-3" style="color:#8892a4;">Privacy</a>
+        <a href="#" class="mr-3" style="color:#8892a4;">Terms</a>
+        <a href="#" style="color:#8892a4;">Contact</a>
+    </div>
+</footer>
+
 {% endblock %}
