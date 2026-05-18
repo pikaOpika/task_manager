@@ -55,6 +55,9 @@ class Task(models.Model):
     )
     slug = models.SlugField(unique=True)
 
+    project = models.ForeignKey("Project", related_name="tasks", 
+                                null=True, blank=True, on_delete=models.CASCADE)
+
     def save(self, *args, **kwargs):
         slugify_name = slugify(f"task-{uuid.uuid4().hex[:8]}")
         if not self.slug:
@@ -80,3 +83,21 @@ class Worker(AbstractUser):
 
     def __str__(self):
         return f"{self.username} {self.position}"
+
+
+
+
+class Project(models.Model):
+    name = models.CharField(max_length=100)
+    description = models.TextField()
+
+    def __str__(self):
+        return self.name
+
+
+
+class Team(models.Model):
+    name = models.CharField(max_length=100)
+    workers = models.ManyToManyField(Worker, related_name="teams")
+    project = models.ForeignKey(Project, related_name="teams",
+                                on_delete=models.SET_NULL, null=True, blank=True)
