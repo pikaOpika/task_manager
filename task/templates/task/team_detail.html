@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}{{ team.name }} — Task Manager{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+        <h4 class="mb-0">{{ team.name }}</h4>
+        <div>
+            <a href="{% url "task:team-update" team.slug %}" class="btn btn-sm btn-outline-light mr-2">Edit</a>
+            <a href="{% url "task:team-delete" team.slug %}" class="btn btn-sm btn-outline-danger">Delete</a>
+        </div>
+    </div>
+    <div class="card-body">
+        {% if team.project %}
+        <p><strong>Project:</strong> <a href="{% url 'task:project-detail' team.project.slug %}">{{ team.project.name }}</a></p>
+        {% else %}
+        <p><strong>Project:</strong> <span class="text-muted">Not assigned</span></p>
+        {% endif %}
+
+        <h5 class="mt-4">Members:</h5>
+        <ul class="list-group">
+            {% for worker in team.workers.all %}
+            <li class="list-group-item">
+                <a href="{% url 'task:worker-detail' worker.slug %}">{{ worker.username }}</a>
+                {% if worker.position %} — {{ worker.position }}{% endif %}
+            </li>
+            {% empty %}
+            <li class="list-group-item text-muted">No members yet.</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endblock %}

@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import Task, Worker, TaskType, Position
+from .models import Task, Worker, TaskType, Position, Team, Project
 
 @admin.register(Task)
 class TaskAdmin(admin.ModelAdmin):
@@ -27,3 +27,13 @@ class WorkerAdmin(UserAdmin):
     list_display = UserAdmin.list_display + ("position",)
     fieldsets = UserAdmin.fieldsets + (("Position info", {"fields": ("position",)}),)
     add_fieldsets = UserAdmin.add_fieldsets + (("Position info", {"fields": ("position",)}),)
+
+@admin.register(Team)
+class TeamAdmin(admin.ModelAdmin):
+    list_display = ["name"]
+
+
+@admin.register(Project)
+class ProjectAdmin(admin.ModelAdmin):
+    list_display = ["name"]
+

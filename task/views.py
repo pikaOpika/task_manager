@@ -3,10 +3,12 @@ from django.views import generic
 from django.urls import reverse_lazy
 from django.contrib.auth import get_user_model, login
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.models import AnonymousUser
 from django.core.exceptions import PermissionDenied
 from django.db.models import Count, Q
 
-from .models import Task, Position
+
+from .models import Task, Position, Project, Team
 from .forms import WorkerForm, WorkerUpdateForm, WorkerSearchForm
 
 # Create your views here.
@@ -30,7 +32,7 @@ class TaskListView(generic.ListView):
         completed = req.get("completed")
         if completed is not None:
             queryset = queryset.filter(is_completed=completed == "true")
-        if req.get("my"):
+        if req.get("my") and self.request.user != AnonymousUser():
             user = self.request.user
             queryset = queryset.filter(assignees=user)
         return queryset
@@ -54,13 +56,11 @@ class TaskDetailView(LoginRequiredMixin, generic.DetailView):
 class TaskCreateView(LoginRequiredMixin, generic.CreateView):
     model = Task
     fields = ["name", "description", "deadline", "priority", "task_type", "assignees"]
-    exclude = ["slug"]
     success_url = reverse_lazy("task:task-list")
 
 class TaskUpdateView(LoginRequiredMixin, generic.UpdateView):
     model = Task
     fields = ["name", "description", "deadline", "is_completed", "priority", "task_type", "assignees"]
-    exclude = ["slug"]
     slug_url_kwarg = "slug"
     slug_field = "slug"
 
@@ -131,3 +131,78 @@ class WorkerUpdateView(LoginRequiredMixin, generic.UpdateView):
     
     def get_success_url(self):
         return reverse_lazy("task:worker-detail", kwargs={"slug": self.object.slug})
+
+
+
+class ProjectListView(generic.ListView):
+    model = Project
+    paginate_by = 5
+    context_object_name = "projects"
+
+    def get_queryset(self):
+        return Project.objects.prefetch_related("tasks").all()
+    
+class ProjectDetailView(generic.DetailView):
+    model = Project
+    slug_field = "slug"
+    slug_url_kwarg = "slug"
+    context_object_name = "project"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["teams"] = self.object.teams.all()
+        context["tasks"] = self.object.tasks.all()
+        return context
+
+
+class ProjectCreateView(generic.CreateView):
+    model = Project
+    fields = ["name", "description"]
+    success_url = reverse_lazy("task:project-list")
+
+class ProjectUpdateView(generic.UpdateView):
+    model = Project
+    fields = ["name", "description"]
+    slug_field = "slug"
+    slug_url_kwarg = "slug"
+
+    def get_success_url(self):
+        return reverse_lazy("task:project-detail", kwargs={"slug": self.object.slug})
+
+class ProjectDeleteView(generic.DeleteView):
+    model = Project
+    slug_url_kwarg = "slug"
+    slug_field = "slug"
+    success_url = reverse_lazy("task:project-list")
+
+
+class TeamListView(generic.ListView):
+    model = Team
+    paginate_by = 5
+    context_object_name = "teams"
+
+class TeamDetailView(generic.DetailView):
+    model = Team
+    slug_field = "slug"
+    slug_url_kwarg = "slug"
+    context_object_name = "team"
+
+class TeamCreateView(generic.CreateView):
+    model = Team
+    fields = ["name", "workers", "project"]
+    success_url = reverse_lazy("task:team-list")
+
+class TeamUpdateView(generic.UpdateView):
+    model = Team
+    slug_field = "slug"
+    slug_url_kwarg = "slug"
+    fields = ["name", "workers", "project"]
+
+    def get_success_url(self):
+        return reverse_lazy("task:team-detail", kwargs={"slug":self.object.slug})
+
+class TeamDeleteView(generic.DeleteView):
+    model = Team
+    slug_url_kwarg = "slug"
+    slug_field = "slug"
+    success_url = reverse_lazy("task:team-list")

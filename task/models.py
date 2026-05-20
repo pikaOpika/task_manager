@@ -90,10 +90,15 @@ class Worker(AbstractUser):
 class Project(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField()
+    slug = models.SlugField(unique=True)
 
     def __str__(self):
         return self.name
 
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(f"project-{uuid.uuid4()}")
+        super().save(*args, **kwargs)
 
 
 class Team(models.Model):
@@ -101,3 +106,12 @@ class Team(models.Model):
     workers = models.ManyToManyField(Worker, related_name="teams")
     project = models.ForeignKey(Project, related_name="teams",
                                 on_delete=models.SET_NULL, null=True, blank=True)
+    slug = models.SlugField(unique=True)
+
+    def __str__(self):
+        return self.name
+    
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(f"team-{uuid.uuid4()}")
+        super().save(*args, **kwargs)
