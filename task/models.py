@@ -3,6 +3,7 @@ import uuid
 from django.db import models
 from django.utils.text import slugify
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AbstractUser
 
 class Position(models.Model):
@@ -90,6 +91,7 @@ class Worker(AbstractUser):
 class Project(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField()
+    created_by = models.ForeignKey(get_user_model(), on_delete=models.PROTECT, related_name="projects")
     slug = models.SlugField(unique=True)
 
     def __str__(self):
@@ -107,6 +109,7 @@ class Team(models.Model):
     project = models.ForeignKey(Project, related_name="teams",
                                 on_delete=models.SET_NULL, null=True, blank=True)
     slug = models.SlugField(unique=True)
+    created_by = models.ForeignKey(get_user_model(), on_delete=models.PROTECT, related_name="my_teams")
 
     def __str__(self):
         return self.name

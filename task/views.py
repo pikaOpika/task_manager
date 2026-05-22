@@ -142,7 +142,7 @@ class ProjectListView(generic.ListView):
     def get_queryset(self):
         return Project.objects.prefetch_related("tasks").all()
     
-class ProjectDetailView(generic.DetailView):
+class ProjectDetailView(LoginRequiredMixin, generic.DetailView):
     model = Project
     slug_field = "slug"
     slug_url_kwarg = "slug"
@@ -155,12 +155,26 @@ class ProjectDetailView(generic.DetailView):
         return context
 
 
-class ProjectCreateView(generic.CreateView):
+class ProjectCreateView(LoginRequiredMixin, generic.CreateView):
     model = Project
     fields = ["name", "description"]
     success_url = reverse_lazy("task:project-list")
 
-class ProjectUpdateView(generic.UpdateView):
+    def form_valid(self, form):
+        form.instance.created_by = self.request.user
+        return super().form_valid(form)
+    
+
+class PermissionCheckedMixin:
+    def get_object(self, queryset = None):
+        obj = super().get_object(queryset)
+        if obj.created_by != self.request.user:
+            raise PermissionDenied
+        return obj
+
+
+
+class ProjectUpdateView(LoginRequiredMixin, PermissionCheckedMixin, generic.UpdateView):
     model = Project
     fields = ["name", "description"]
     slug_field = "slug"
@@ -168,18 +182,24 @@ class ProjectUpdateView(generic.UpdateView):
 
     def get_success_url(self):
         return reverse_lazy("task:project-detail", kwargs={"slug": self.object.slug})
+    
 
-class ProjectDeleteView(generic.DeleteView):
+class ProjectDeleteView(LoginRequiredMixin, PermissionCheckedMixin, generic.DeleteView):
     model = Project
     slug_url_kwarg = "slug"
     slug_field = "slug"
     success_url = reverse_lazy("task:project-list")
 
+    
 
 class TeamListView(generic.ListView):
     model = Team
     paginate_by = 5
     context_object_name = "teams"
+
+    def get_queryset(self):
+        return super().get_queryset().select_related("project", "created_by").prefetch_related("workers").all()
+    
 
 class TeamDetailView(generic.DetailView):
     model = Team
@@ -187,12 +207,22 @@ class TeamDetailView(generic.DetailView):
     slug_url_kwarg = "slug"
     context_object_name = "team"
 
-class TeamCreateView(generic.CreateView):
+    def get_queryset(self):
+        return super().get_queryset().select_related("project", "created_by").prefetch_related("workers").all()
+
+    
+
+class TeamCreateView(LoginRequiredMixin, generic.CreateView):
     model = Team
     fields = ["name", "workers", "project"]
     success_url = reverse_lazy("task:team-list")
 
-class TeamUpdateView(generic.UpdateView):
+    def form_valid(self, form):
+        form.instance.created_by = self.request.user
+        return super().form_valid(form)
+    
+
+class TeamUpdateView(LoginRequiredMixin, PermissionCheckedMixin, generic.UpdateView):
     model = Team
     slug_field = "slug"
     slug_url_kwarg = "slug"
@@ -201,7 +231,7 @@ class TeamUpdateView(generic.UpdateView):
     def get_success_url(self):
         return reverse_lazy("task:team-detail", kwargs={"slug":self.object.slug})
 
-class TeamDeleteView(generic.DeleteView):
+class TeamDeleteView(LoginRequiredMixin, PermissionCheckedMixin, generic.DeleteView):
     model = Team
     slug_url_kwarg = "slug"
     slug_field = "slug"
