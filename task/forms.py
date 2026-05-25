@@ -6,6 +6,7 @@ from .models import Position
 
 class WorkerForm(UserCreationForm):
     position = forms.ModelChoiceField(queryset=Position.objects.all())
+    image = forms.ImageField(label="")
     class Meta(UserCreationForm.Meta):
         model = get_user_model()
         fields = UserCreationForm.Meta.fields + ("position", "image")
@@ -16,4 +17,7 @@ class WorkerUpdateForm(forms.ModelForm):
         fields = ["username", "position", "image"]
 
 class WorkerSearchForm(forms.Form):
-    username = forms.CharField(required=False, max_length=100, label="")
+    username = forms.CharField(required=False, max_length=100, label="", widget=forms.TextInput(attrs={"class": "form-control", "placeholder": "Search by username..."}))
+
+class TaskSearchForm(forms.Form):
+    project = forms.CharField(required=False, max_length=20, label="", widget=forms.TextInput(attrs={"class": "form-control", "placeholder": "Search by project..."}))

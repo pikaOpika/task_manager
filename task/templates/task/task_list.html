@@ -3,16 +3,27 @@
 {% block title %}Tasks — Task Manager{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
+<div class="d-flex justify-content-between align-items-center mb-3">
     <h1>Tasks</h1>
-    <a href="{% url "task:task-create" %}" class="btn btn-success">+ New Task</a>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <form method="get" class="mr-3">
+            <div class="input-group">
+                {{ search_form.project }}
+                <div class="input-group-append">
+                    <button type="submit" class="btn btn-primary">Search</button>
+                </div>
+            </div>
+        </form>
+        <a href="{% url "task:task-create" %}" class="btn btn-success">+ New Task</a>
+    </div>
 </div>
 
 <div class="mb-3">
-    <a href="{% url "task:task-list" %}" class="btn btn-outline-secondary btn-sm mr-2">All Tasks</a>
-    <a href="?my=true" class="btn btn-outline-primary btn-sm mr-2">My Tasks</a>
-    <a href="?completed=true" class="btn btn-outline-success btn-sm mr-2">Completed</a>
-    <a href="?completed=false" class="btn btn-outline-warning btn-sm">Not Completed</a>
+    <a href="{% url "task:task-list" %}" class="btn btn-outline-secondary btn-sm mr-2 {% if not request.GET.completed and not request.GET.my and not request.GET.no_projects %}active{% endif %}">All Tasks</a>
+    <a href="?my=true" class="btn btn-outline-primary btn-sm mr-2 {% if request.GET.my %}active{% endif %}">My Tasks</a>
+    <a href="?completed=true" class="btn btn-outline-success btn-sm mr-2 {% if request.GET.completed == 'true' %}active{% endif %}">Completed</a>
+    <a href="?completed=false" class="btn btn-outline-warning btn-sm mr-2 {% if request.GET.completed == 'false' %}active{% endif %}">Not Completed</a>
+    <a href="?no_projects=true" class="btn btn-outline-info btn-sm {% if request.GET.no_projects %}active{% endif %}">No Project</a>
 </div>
 
 <div class="list-group">
@@ -42,4 +53,5 @@
     <div class="list-group-item text-muted text-center">No tasks found.</div>
     {% endfor %}
 </div>
+
 {% endblock %}

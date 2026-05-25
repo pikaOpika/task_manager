@@ -9,8 +9,7 @@
     <div class="d-flex align-items-center">
         <form method="get" class="mr-3">
             <div class="input-group">
-                <input type="text" name="username" value="{{ request.GET.username }}" 
-                       class="form-control" placeholder="Search by username...">
+                {{ search_form.username }}
                 <div class="input-group-append">
                     <button type="submit" class="btn btn-primary">Search</button>
                 </div>
@@ -60,6 +59,6 @@
     {% endfor %}
 </div>
 
-{% include "includes/pagination.html" %}
+
 
 {% endblock %}

@@ -9,7 +9,7 @@ from django.db.models import Count, Q
 
 
 from .models import Task, Position, Project, Team
-from .forms import WorkerForm, WorkerUpdateForm, WorkerSearchForm
+from .forms import WorkerForm, WorkerUpdateForm, WorkerSearchForm, TaskSearchForm
 
 class HomeView(generic.TemplateView):
     template_name = "task/index.html"
@@ -36,12 +36,22 @@ class TaskListView(generic.ListView):
         queryset = Task.objects.all()
         req = self.request.GET
         completed = req.get("completed")
+        project = req.get("project")
         if completed is not None:
             queryset = queryset.filter(is_completed=completed == "true")
         if req.get("my") and self.request.user != AnonymousUser():
             user = self.request.user
             queryset = queryset.filter(assignees=user)
+        if req.get("no_projects"):
+            queryset = queryset.filter(project__isnull=True)
+        if project is not None:
+            queryset = queryset.filter(project__name__icontains=project)
         return queryset
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["search_form"] = TaskSearchForm(self.request.GET)
+        return context
 
 class TaskDetailView(LoginRequiredMixin, generic.DetailView):
     model = Task
@@ -64,7 +74,20 @@ class TaskCreateView(LoginRequiredMixin, generic.CreateView):
     fields = ["name", "description", "deadline", "priority", "task_type", "assignees"]
     success_url = reverse_lazy("task:task-list")
 
-class TaskUpdateView(LoginRequiredMixin, generic.UpdateView):
+    def form_valid(self, form):
+        res = super().form_valid(form)
+        form.instance.assignees.add(self.request.user.id)
+        return res
+
+class PermissionCheckedTaskMixin:
+    def get_object(self, queryset=None):
+        obj = super().get_object(queryset)
+        if self.request.user not in obj.assignees.all():
+            raise PermissionDenied
+        return obj
+
+
+class TaskUpdateView(LoginRequiredMixin, PermissionCheckedTaskMixin, generic.UpdateView):
     model = Task
     fields = ["name", "description", "deadline", "is_completed", "priority", "task_type", "assignees"]
     slug_url_kwarg = "slug"
@@ -73,7 +96,7 @@ class TaskUpdateView(LoginRequiredMixin, generic.UpdateView):
     def get_success_url(self):
         return reverse_lazy("task:task-detail", kwargs={"slug": self.object.slug})
 
-class TaskDeleteView(LoginRequiredMixin, generic.DeleteView):
+class TaskDeleteView(LoginRequiredMixin, PermissionCheckedTaskMixin, generic.DeleteView):
     model = Task
     success_url = reverse_lazy("task:task-list")
     slug_url_kwarg = "slug"
