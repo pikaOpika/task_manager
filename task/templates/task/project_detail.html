@@ -6,26 +6,34 @@
 <div class="card">
     <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
         <h4 class="mb-0">{{ project.name }}</h4>
+        {% if user == project.created_by %}
         <div>
             <a href="{% url "task:project-update" project.slug %}" class="btn btn-sm btn-outline-light mr-2">Edit</a>
             <a href="{% url "task:project-delete" project.slug %}" class="btn btn-sm btn-outline-danger">Delete</a>
         </div>
+        {% endif %}
     </div>
     <div class="card-body">
         <p><strong>Description:</strong> {{ project.description }}</p>
 
-        <h5 class="mt-4">Teams:</h5>
+        <div class="d-flex justify-content-between align-items-center mt-4 mb-2">
+            <h5 class="mb-0">Teams</h5>
+            <a href="{% url 'task:team-create' %}?project={{ project.slug }}" class="btn btn-sm btn-outline-primary">+ Add Team</a>
+        </div>
         <ul class="list-group mb-3">
             {% for team in teams %}
             <li class="list-group-item">
                 <a href="{% url 'task:team-detail' team.slug %}">{{ team.name }}</a>
             </li>
             {% empty %}
-            <li class="list-group-item text-muted">No teams assigned.</li>
+            <li class="list-group-item text-muted">No teams yet.</li>
             {% endfor %}
         </ul>
 
-        <h5 class="mt-4">Tasks:</h5>
+        <div class="d-flex justify-content-between align-items-center mt-4 mb-2">
+            <h5 class="mb-0">Tasks</h5>
+            <a href="{% url 'task:task-create' %}?project={{ project.slug }}" class="btn btn-sm btn-outline-primary">+ Add Task</a>
+        </div>
         <ul class="list-group">
             {% for task in tasks %}
             <li class="list-group-item d-flex justify-content-between align-items-center">
@@ -37,7 +45,7 @@
                 {% endif %}
             </li>
             {% empty %}
-            <li class="list-group-item text-muted">No tasks assigned.</li>
+            <li class="list-group-item text-muted">No tasks yet.</li>
             {% endfor %}
         </ul>
     </div>

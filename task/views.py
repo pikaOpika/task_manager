@@ -27,6 +27,9 @@ class HomeView(generic.TemplateView):
 class HowItWorksView(generic.TemplateView):
     template_name = "task/how_it_works.html"
 
+class OnboardingView(generic.TemplateView):
+    template_name = "registration/onboarding.html"
+
 
 class TaskListView(generic.ListView):
     model = Task
@@ -72,9 +75,17 @@ class TaskDetailView(LoginRequiredMixin, generic.DetailView):
 class TaskCreateView(LoginRequiredMixin, generic.CreateView):
     model = Task
     fields = ["name", "description", "deadline", "priority", "task_type", "assignees"]
-    success_url = reverse_lazy("task:task-list")
+    
+    def get_success_url(self):
+        slug_project = self.request.GET.get("project")
+        if slug_project:
+            return reverse_lazy("task:project-detail", kwargs={"slug": slug_project})
+        return reverse_lazy("task:task-detail", kwargs={"slug": self.object.slug}) 
 
     def form_valid(self, form):
+        slug_project = self.request.GET.get("project")
+        if slug_project:
+            form.instance.project = Project.objects.get(slug=slug_project)
         res = super().form_valid(form)
         form.instance.assignees.add(self.request.user.id)
         return res
@@ -140,7 +151,7 @@ class WorkerDetailView(LoginRequiredMixin, generic.DetailView):
 class WorkerCreateView(generic.CreateView):
     model = get_user_model()
     form_class = WorkerForm
-    success_url = reverse_lazy("task:index")
+    success_url = reverse_lazy("task:onboarding")
 
     def form_valid(self, form):
         response = super().form_valid(form)
@@ -187,7 +198,10 @@ class ProjectDetailView(LoginRequiredMixin, generic.DetailView):
 class ProjectCreateView(LoginRequiredMixin, generic.CreateView):
     model = Project
     fields = ["name", "description"]
-    success_url = reverse_lazy("task:project-list")
+    
+
+    def get_success_url(self):
+        return reverse_lazy("task:project-detail", kwargs={"slug": self.object.slug})
 
     def form_valid(self, form):
         form.instance.created_by = self.request.user
@@ -243,10 +257,18 @@ class TeamDetailView(generic.DetailView):
 
 class TeamCreateView(LoginRequiredMixin, generic.CreateView):
     model = Team
-    fields = ["name", "workers", "project"]
-    success_url = reverse_lazy("task:team-list")
+    fields = ["name", "workers", "project"] 
+    
+    def get_success_url(self):
+        slug_project = self.request.GET.get("project")
+        if slug_project:
+            return reverse_lazy("task:project-detail", kwargs={"slug": slug_project})
+        return reverse_lazy("task:team-detail", kwargs={"slug": self.object.slug})
 
     def form_valid(self, form):
+        slug_project = self.request.GET.get("project")
+        if slug_project:
+            form.instance.project = Project.objects.get(slug=slug_project)
         form.instance.created_by = self.request.user
         return super().form_valid(form)
     

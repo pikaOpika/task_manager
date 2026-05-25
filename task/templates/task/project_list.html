@@ -18,10 +18,13 @@
                 </h5>
                 <small class="text-muted">{{ project.description|truncatewords:15 }}</small>
             </div>
+            {% if user == project.created_by %}
+            
             <div>
                 <a href="{% url "task:project-update" project.slug %}" class="btn btn-sm btn-outline-primary mr-1">Edit</a>
                 <a href="{% url "task:project-delete" project.slug %}" class="btn btn-sm btn-outline-danger">Delete</a>
             </div>
+            {% endif %}
         </div>
     </div>
     {% empty %}

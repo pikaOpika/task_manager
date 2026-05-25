@@ -6,10 +6,12 @@
 <div class="card">
     <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
         <h4 class="mb-0">{{ task.name }}</h4>
+        {% if user in task.assignees.all %}
         <div>
             <a href="{% url "task:task-update" task.slug %}" class="btn btn-sm btn-outline-light mr-2">Edit</a>
             <a href="{% url "task:task-delete" task.slug %}" class="btn btn-sm btn-outline-danger">Delete</a>
         </div>
+        {% endif %}
     </div>
     <div class="card-body">
         <p><strong>Description:</strong> {{ task.description }}</p>
