@@ -11,16 +11,22 @@ from django.db.models import Count, Q
 from .models import Task, Position, Project, Team
 from .forms import WorkerForm, WorkerUpdateForm, WorkerSearchForm
 
-# Create your views here.
-def index(request):
-    context = {
-        "stats": [
-            ("12k+", "Active users"),
-            ("340k", "Tasks completed"),
-            ("98%", "Satisfaction"),
-        ]
-    }
-    return render(request, "task/index.html", context=context)
+class HomeView(generic.TemplateView):
+    template_name = "task/index.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["stats"] = (
+            (get_user_model().objects.count(), "Active users"),
+            (Task.objects.filter(is_completed=True).count(), "Task completed"),
+            (Project.objects.count(), "Projects"),
+        )
+        return context
+
+
+class HowItWorksView(generic.TemplateView):
+    template_name = "task/how_it_works.html"
+
 
 class TaskListView(generic.ListView):
     model = Task

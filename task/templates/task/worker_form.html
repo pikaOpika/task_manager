@@ -2,7 +2,7 @@
 {% load crispy_forms_filters %}
 
 {% block title %}
-    {{object|yesno:"Update,Create" }} Task — Task Manager
+    {{ object|yesno:"Update,Create" }} Profile — TaskFlow
 {% endblock %}
 
 {% block content %}
@@ -10,12 +10,39 @@
     <div class="col-md-8">
         <div class="card">
             <div class="card-header bg-dark text-white">
-                <h4 class="mb-0">
-                    {{ object|yesno:"Update,Cretate" }} Worker
-                </h4>
+                <h4 class="mb-0">{{ object|yesno:"Update profile,Create profile" }}</h4>
             </div>
             <div class="card-body">
-                <form method="post" enctype="multipart/form-data">
+
+                <!-- Avatar preview -->
+                <div class="text-center mb-4">
+                    <div id="avatar-preview" onclick="document.getElementById('id_image').click()"
+                         style="width:110px;height:110px;border-radius:50%;background:#0f3460;display:flex;
+                                align-items:center;justify-content:center;margin:0 auto;overflow:hidden;
+                                cursor:pointer;border:3px dashed #8892a4;transition:border-color .2s;">
+                        {% if object and object.image %}
+                            <img id="avatar-img" src="{{ object.image.url }}"
+                                 style="width:100%;height:100%;object-fit:cover;">
+                        {% else %}
+                            <span id="avatar-placeholder" style="color:#8892a4;font-size:36px;">+</span>
+                            <img id="avatar-img" src="" style="display:none;width:100%;height:100%;object-fit:cover;">
+                        {% endif %}
+                    </div>
+                    <small style="color:#8892a4;" class="d-block mt-2">Click or drag a photo here</small>
+                </div>
+
+                <!-- Drag & drop zone -->
+                <div id="drop-zone"
+                     style="border:2px dashed #0f3460;border-radius:8px;padding:20px;text-align:center;
+                            color:#8892a4;margin-bottom:20px;transition:background .2s;cursor:pointer;"
+                     onclick="document.getElementById('id_image').click()">
+                    <div id="drop-text">
+                        <strong style="color:#e94560;">Choose a file</strong> or drag it here
+                    </div>
+                    <div id="drop-filename" style="display:none;color:#e94560;font-weight:bold;"></div>
+                </div>
+
+                <form method="post" enctype="multipart/form-data" id="worker-form">
                     {% csrf_token %}
                     {{ form|crispy }}
                     <div class="d-flex justify-content-between mt-3">
@@ -23,8 +50,83 @@
                         <button type="submit" class="btn btn-primary">Save</button>
                     </div>
                 </form>
+
             </div>
         </div>
     </div>
 </div>
-{% endblock %}s
+
+<script>
+    const input = document.getElementById("id_image");
+    const dropZone = document.getElementById("drop-zone");
+    const avatarPreview = document.getElementById("avatar-preview");
+    const avatarImg = document.getElementById("avatar-img");
+    const avatarPlaceholder = document.getElementById("avatar-placeholder");
+    const dropFilename = document.getElementById("drop-filename");
+    const dropText = document.getElementById("drop-text");
+
+    // hide default Django file input — the drop zone and avatar handle it
+    if (input) {
+        input.style.display = "none";
+        // move input inside the form so it still submits
+        document.getElementById("worker-form").appendChild(input);
+    }
+
+    function showPreview(file) {
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            avatarImg.src = e.target.result;
+            avatarImg.style.display = "block";
+            if (avatarPlaceholder) avatarPlaceholder.style.display = "none";
+        };
+        reader.readAsDataURL(file);
+        dropFilename.textContent = file.name;
+        dropFilename.style.display = "block";
+        dropText.style.display = "none";
+        dropZone.style.borderColor = "#e94560";
+    }
+
+    input.addEventListener("change", () => showPreview(input.files[0]));
+
+    // drag & drop
+    dropZone.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        dropZone.style.background = "#1a1a2e";
+    });
+    dropZone.addEventListener("dragleave", () => {
+        dropZone.style.background = "";
+    });
+    dropZone.addEventListener("drop", (e) => {
+        e.preventDefault();
+        dropZone.style.background = "";
+        const file = e.dataTransfer.files[0];
+        if (file) {
+            const dt = new DataTransfer();
+            dt.items.add(file);
+            input.files = dt.files;
+            showPreview(file);
+        }
+    });
+
+    // avatar circle also acts as drop target
+    avatarPreview.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        avatarPreview.style.borderColor = "#e94560";
+    });
+    avatarPreview.addEventListener("dragleave", () => {
+        avatarPreview.style.borderColor = "#8892a4";
+    });
+    avatarPreview.addEventListener("drop", (e) => {
+        e.preventDefault();
+        avatarPreview.style.borderColor = "#8892a4";
+        const file = e.dataTransfer.files[0];
+        if (file) {
+            const dt = new DataTransfer();
+            dt.items.add(file);
+            input.files = dt.files;
+            showPreview(file);
+        }
+    });
+</script>
+{% endblock %}

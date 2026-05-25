@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}How it works — TaskFlow{% endblock %}
+
+{% block content %}
+
+<div class="text-center mb-5">
+    <h1 class="font-weight-bold">How TaskFlow works</h1>
+    <p class="lead" style="color:#8892a4;">A simple tool for tracking tasks, managing teams and organizing projects.</p>
+</div>
+
+<!-- Steps -->
+<div class="row mb-5">
+    <div class="col-md-3 text-center mb-4">
+        <div class="card h-100 py-4">
+            <div class="card-body">
+                <h1 style="color:#e94560;">1</h1>
+                <h5 class="font-weight-bold">Create an account</h5>
+                <p style="color:#8892a4;">Register and set up your profile. Choose your position and start working.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 text-center mb-4">
+        <div class="card h-100 py-4">
+            <div class="card-body">
+                <h1 style="color:#e94560;">2</h1>
+                <h5 class="font-weight-bold">Create or join a team</h5>
+                <p style="color:#8892a4;">Build your team or join an existing one. Collaborate with colleagues on shared goals.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 text-center mb-4">
+        <div class="card h-100 py-4">
+            <div class="card-body">
+                <h1 style="color:#e94560;">3</h1>
+                <h5 class="font-weight-bold">Set up a project</h5>
+                <p style="color:#8892a4;">Create a project and assign teams to it. Keep all related work in one place.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 text-center mb-4">
+        <div class="card h-100 py-4">
+            <div class="card-body">
+                <h1 style="color:#e94560;">4</h1>
+                <h5 class="font-weight-bold">Track tasks</h5>
+                <p style="color:#8892a4;">Create tasks, assign them to team members, set deadlines and track progress.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- What you can do -->
+<div class="card mb-5">
+    <div class="card-header font-weight-bold" style="background:#1a1a2e;">What you can do</div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <ul class="list-unstyled">
+                    <li class="mb-2">✅ Create and assign tasks with priorities and deadlines</li>
+                    <li class="mb-2">✅ Mark tasks as completed</li>
+                    <li class="mb-2">✅ Filter tasks by status or assignee</li>
+                    <li class="mb-2">✅ Create and manage teams</li>
+                </ul>
+            </div>
+            <div class="col-md-6">
+                <ul class="list-unstyled">
+                    <li class="mb-2">✅ Create projects and attach teams to them</li>
+                    <li class="mb-2">✅ View all workers and their completed tasks</li>
+                    <li class="mb-2">✅ Update your profile and position</li>
+                    <li class="mb-2">✅ Assign yourself to any task</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- CTA -->
+<div class="text-center mb-4">
+    <h4>Ready to start?</h4>
+    <a href="{% url 'task:worker-create' %}" class="btn btn-primary btn-lg mt-2">Create your account</a>
+</div>
+
+{% endblock %}

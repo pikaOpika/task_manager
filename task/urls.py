@@ -1,7 +1,7 @@
 from django.urls import path
 
 from .views import (
-    index, 
+    HomeView, HowItWorksView,
     TaskListView, TaskDetailView,
     TaskCreateView, TaskUpdateView, TaskDeleteView,
     WorkerListView, WorkerDetailView, 
@@ -16,7 +16,8 @@ app_name = 'task'
 
 urlpatterns = [
     # Home page
-    path('', index, name='index'),
+    path('', HomeView.as_view(), name='index'),
+    path('how-it-works/', HowItWorksView.as_view(), name='how-it-works'),
     # Registration for workers
     path('registration/', WorkerCreateView.as_view(), name="worker-create"),
     # Tasks
