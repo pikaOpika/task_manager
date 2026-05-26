@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import get_user_model
 
-from .models import Position
+from .models import Position, Task
 
 class WorkerForm(UserCreationForm):
     position = forms.ModelChoiceField(queryset=Position.objects.all())
@@ -20,3 +20,15 @@ class WorkerSearchForm(forms.Form):
 
 class TaskSearchForm(forms.Form):
     project = forms.CharField(required=False, max_length=20, label="", widget=forms.TextInput(attrs={"class": "form-control", "placeholder": "Search by project..."}))
+
+class TaskForm(forms.ModelForm):
+    class Meta:
+        model=Task
+        fields = ["name", "description", "deadline", "priority", "task_type", "assignees"]
+        widgets = {
+            "deadline": forms.DateInput(attrs={"type": "date"})
+        }
+
+class TaskUpdateForm(TaskForm):
+    class Meta(TaskForm.Meta):
+        fields = TaskForm.Meta.fields + ["is_completed"]

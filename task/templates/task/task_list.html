@@ -40,7 +40,12 @@
                     {% endif %}
                 </h5>
                 <small class="text-muted">
-                    Deadline: {{ task.deadline }} | Priority: {{ task.get_priority_display }} | Type: {{ task.task_type }}
+                    Deadline: {{ task.deadline }} |
+                    {% if task.priority == "U" %}<span class="badge badge-danger">Urgent</span>
+                    {% elif task.priority == "H" %}<span class="badge badge-warning">High</span>
+                    {% else %}<span class="badge badge-secondary">Low</span>
+                    {% endif %}
+                    | Type: {{ task.task_type }}
                 </small>
             </div>
             {% if user in task.assignees.all %}

@@ -9,7 +9,10 @@ from django.db.models import Count, Q
 
 
 from .models import Task, Position, Project, Team
-from .forms import WorkerForm, WorkerUpdateForm, WorkerSearchForm, TaskSearchForm
+from .forms import (
+    WorkerForm, WorkerUpdateForm, WorkerSearchForm,
+    TaskSearchForm, TaskForm, TaskUpdateForm
+)
 
 class HomeView(generic.TemplateView):
     template_name = "task/index.html"
@@ -36,7 +39,7 @@ class TaskListView(generic.ListView):
     paginate_by = 5
 
     def get_queryset(self):
-        queryset = Task.objects.all()
+        queryset = Task.objects.prefetch_related("assignees").all()
         req = self.request.GET
         completed = req.get("completed")
         project = req.get("project")
@@ -74,7 +77,16 @@ class TaskDetailView(LoginRequiredMixin, generic.DetailView):
 
 class TaskCreateView(LoginRequiredMixin, generic.CreateView):
     model = Task
-    fields = ["name", "description", "deadline", "priority", "task_type", "assignees"]
+    form_class = TaskForm
+    
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        project = self.request.GET.get("project")
+        if project:
+            queryset = get_user_model().objects.filter(teams__project__slug=project)
+            if queryset.exists():
+                form.fields["assignees"].queryset = queryset
+        return form
     
     def get_success_url(self):
         slug_project = self.request.GET.get("project")
@@ -100,7 +112,7 @@ class PermissionCheckedTaskMixin:
 
 class TaskUpdateView(LoginRequiredMixin, PermissionCheckedTaskMixin, generic.UpdateView):
     model = Task
-    fields = ["name", "description", "deadline", "is_completed", "priority", "task_type", "assignees"]
+    form_class = TaskUpdateForm
     slug_url_kwarg = "slug"
     slug_field = "slug"
 
@@ -119,7 +131,10 @@ class WorkerListView(generic.ListView):
 
     def get_queryset(self):
         queryset = super().get_queryset().prefetch_related("tasks").select_related("position")\
-        .annotate(completed_count=Count("tasks", filter=Q(tasks__is_completed=True)))
+        .annotate(
+            completed_count=Count("tasks", filter=Q(tasks__is_completed=True)),
+            uncompleted_count=Count("tasks", filter=Q(tasks__is_completed=False))
+        )
         req = self.request.GET
         username = req.get("username")
         position = req.get("position")
@@ -257,7 +272,7 @@ class TeamDetailView(generic.DetailView):
 
 class TeamCreateView(LoginRequiredMixin, generic.CreateView):
     model = Team
-    fields = ["name", "workers", "project"] 
+    fields = ["name", "workers"] 
     
     def get_success_url(self):
         slug_project = self.request.GET.get("project")

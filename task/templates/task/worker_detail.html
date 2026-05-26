@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}{{ object.username }} — Task Manager{% endblock %}
 
@@ -10,10 +11,18 @@
         <a href="{% url "task:worker-update" object.slug %}" class="btn btn-sm btn-outline-light">Edit</a>
         {% endif %}
     </div>
-    <div class="card-body">
-        <p><strong>Username:</strong> {{ object.username }}</p>
-        <p><strong>Email:</strong> {{ object.email }}</p>
-        <p><strong>Position:</strong> {{ object.position }}</p>
+    <div class="card-body d-flex align-items-center">
+        <img
+            src="{% if object.image %}{{ object.image.url }}{% else %}{% static 'images/profile.png' %}{% endif %}"
+            alt="{{ object.username }}"
+            class="rounded-circle mr-4"
+            style="width: 90px; height: 90px; object-fit: cover; border: 3px solid var(--accent);"
+        >
+        <div>
+            <p class="mb-1"><strong>Username:</strong> {{ object.username }}</p>
+            <p class="mb-1"><strong>Email:</strong> {{ object.email }}</p>
+            <p class="mb-0"><strong>Position:</strong> {{ object.position }}</p>
+        </div>
     </div>
 </div>
 

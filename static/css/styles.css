@@ -113,6 +113,8 @@ body {
 }
 
 /* Forms */
+.asteriskField { display: none; }
+
 .form-control {
     background-color: var(--bg-secondary);
     border-color: var(--border);

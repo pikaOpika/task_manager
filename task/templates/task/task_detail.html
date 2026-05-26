@@ -16,7 +16,13 @@
     <div class="card-body">
         <p><strong>Description:</strong> {{ task.description }}</p>
         <p><strong>Deadline:</strong> {{ task.deadline }}</p>
-        <p><strong>Priority:</strong> {{ task.get_priority_display }}</p>
+        <p>
+            <strong>Priority:</strong>
+            {% if task.priority == "U" %}<span class="badge badge-danger">Urgent</span>
+            {% elif task.priority == "H" %}<span class="badge badge-warning">High</span>
+            {% else %}<span class="badge badge-secondary">Low</span>
+            {% endif %}
+        </p>
         <p><strong>Type:</strong> {{ task.task_type }}</p>
         <p>
             <strong>Status:</strong>

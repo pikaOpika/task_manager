@@ -22,10 +22,12 @@
                 <small class="text-muted">No project assigned</small>
                 {% endif %}
             </div>
+            {% if user == team.created_by %}
             <div>
                 <a href="{% url "task:team-update" team.slug %}" class="btn btn-sm btn-outline-primary mr-1">Edit</a>
                 <a href="{% url "task:team-delete" team.slug %}" class="btn btn-sm btn-outline-danger">Delete</a>
             </div>
+            {% endif %}
         </div>
     </div>
     {% empty %}
