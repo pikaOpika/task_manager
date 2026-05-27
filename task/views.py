@@ -68,9 +68,15 @@ class TaskDetailView(LoginRequiredMixin, generic.DetailView):
         obj = self.get_object()
         action = self.request.POST.get("action")
         if action == "assign":
-            obj.assignees.add(self.request.user)
-        else:
+            if obj.project is None or obj.project.teams.filter(workers=self.request.user).exists():
+                obj.assignees.add(self.request.user)
+            else:
+                raise PermissionDenied()
+        if action == "remove":
             obj.assignees.remove(self.request.user)
+        if action == "complete":
+            obj.is_completed = not obj.is_completed
+            obj.save()
         return redirect("task:task-detail", slug=obj.slug)
     
     
@@ -318,7 +324,7 @@ class TeamDeleteView(LoginRequiredMixin, PermissionCheckedMixin, generic.DeleteV
     success_url = reverse_lazy("task:team-list")
 
 
-class JoinRequestCreateView(generic.View):
+class JoinRequestCreateView(LoginRequiredMixin, generic.View):
     def post(self, request, *args, **kwargs):
         slug_project=self.kwargs.get("slug")
         project = Project.objects.get(slug=slug_project)
@@ -328,7 +334,7 @@ class JoinRequestCreateView(generic.View):
 
         return redirect("task:project-detail", slug=slug_project)
 
-class JoinRequestReviewView(generic.View):
+class JoinRequestReviewView(LoginRequiredMixin, generic.View):
     def post(self, request, *args, **kwargs):
         pk = self.kwargs.get("pk")
         join_request = JoinRequest.objects.get(pk=pk)

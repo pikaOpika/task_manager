@@ -42,10 +42,13 @@
             {% endfor %}
         </ul>
 
-        <form method="post">
+        <form method="post" class="d-flex gap-2 mt-3">
             {% csrf_token %}
             {% if user in task.assignees.all %}
-            <button type="submit" name="action" value="remove" class="btn btn-danger">Remove me from task</button>
+            <button type="submit" name="action" value="remove" class="btn btn-outline-danger mr-2">Remove me from task</button>
+            <button type="submit" name="action" value="complete" class="btn {% if task.is_completed %}btn-outline-warning{% else %}btn-success{% endif %}">
+                {% if task.is_completed %}Mark as In Progress{% else %}Mark as Completed{% endif %}
+            </button>
             {% else %}
             <button type="submit" name="action" value="assign" class="btn btn-success">Assign me to task</button>
             {% endif %}
