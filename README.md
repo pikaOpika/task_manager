@@ -46,3 +46,67 @@ python manage.py runserver
 ```
 
 Open your browser at `http://127.0.0.1:8000`
+
+## Database Schema
+
+```mermaid
+erDiagram
+    Position {
+        int id
+        string name
+    }
+    TaskType {
+        int id
+        string name
+    }
+    Worker {
+        int id
+        string username
+        string slug
+        image image
+        int position_id FK
+    }
+    Task {
+        int id
+        string name
+        text description
+        date deadline
+        bool is_completed
+        string priority
+        string slug
+        int task_type_id FK
+        int project_id FK
+    }
+    Project {
+        int id
+        string name
+        text description
+        string slug
+        int created_by_id FK
+    }
+    Team {
+        int id
+        string name
+        string slug
+        int project_id FK
+        int created_by_id FK
+    }
+    JoinRequest {
+        int id
+        string status
+        datetime created_at
+        int project_id FK
+        int from_user_id FK
+    }
+
+    Worker }o--o| Position : "has position"
+    Task }o--o| TaskType : "has type"
+    Task }o--o| Project : "belongs to"
+    Task }o--o{ Worker : "assignees"
+    Project ||--o{ Team : "has teams"
+    Project }o--|| Worker : "created by"
+    Team }o--o{ Worker : "members"
+    Team }o--|| Worker : "created by"
+    JoinRequest }o--|| Project : "request for"
+    JoinRequest }o--|| Worker : "request from"
+```
