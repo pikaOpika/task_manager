@@ -8,7 +8,7 @@ from django.core.exceptions import PermissionDenied
 from django.db.models import Count, Q
 
 
-from .models import Task, Position, Project, Team
+from .models import Task, Position, Project, Team, JoinRequest
 from .forms import (
     WorkerForm, WorkerUpdateForm, WorkerSearchForm,
     TaskSearchForm, TaskForm, TaskUpdateForm
@@ -97,7 +97,13 @@ class TaskCreateView(LoginRequiredMixin, generic.CreateView):
     def form_valid(self, form):
         slug_project = self.request.GET.get("project")
         if slug_project:
-            form.instance.project = Project.objects.get(slug=slug_project)
+            project = Project.objects.get(slug=slug_project)
+            members = project.teams.filter(workers=self.request.user).exists()
+            
+            if project.created_by == self.request.user or members:
+                form.instance.project = project
+            else:
+                raise PermissionDenied() 
         res = super().form_valid(form)
         form.instance.assignees.add(self.request.user.id)
         return res
@@ -207,6 +213,9 @@ class ProjectDetailView(LoginRequiredMixin, generic.DetailView):
         context = super().get_context_data(**kwargs)
         context["teams"] = self.object.teams.all()
         context["tasks"] = self.object.tasks.all()
+        context["join_requests"] = self.object.requests.filter(status="P")
+        context["user_in_project"] = self.object.teams.filter(workers=self.request.user).exists()
+        context["user_already_requested"] = self.object.requests.filter(from_user=self.request.user, status="P").exists()
         return context
 
 
@@ -283,7 +292,12 @@ class TeamCreateView(LoginRequiredMixin, generic.CreateView):
     def form_valid(self, form):
         slug_project = self.request.GET.get("project")
         if slug_project:
-            form.instance.project = Project.objects.get(slug=slug_project)
+            project = Project.objects.get(slug=slug_project)
+            if project.created_by == self.request.user:
+                form.instance.project = project
+            else:
+                raise PermissionDenied()
+            
         form.instance.created_by = self.request.user
         return super().form_valid(form)
     
@@ -302,3 +316,34 @@ class TeamDeleteView(LoginRequiredMixin, PermissionCheckedMixin, generic.DeleteV
     slug_url_kwarg = "slug"
     slug_field = "slug"
     success_url = reverse_lazy("task:team-list")
+
+
+class JoinRequestCreateView(generic.View):
+    def post(self, request, *args, **kwargs):
+        slug_project=self.kwargs.get("slug")
+        project = Project.objects.get(slug=slug_project)
+        JoinRequest.objects.get_or_create(
+            project=project, from_user=self.request.user
+        )
+
+        return redirect("task:project-detail", slug=slug_project)
+
+class JoinRequestReviewView(generic.View):
+    def post(self, request, *args, **kwargs):
+        pk = self.kwargs.get("pk")
+        join_request = JoinRequest.objects.get(pk=pk)
+        if self.request.user == join_request.project.created_by:
+            action = request.POST.get("action")
+            if action == "approve":
+                join_request.status="A"
+                join_request.save()
+                team_id = request.POST.get("team_id")
+                team = Team.objects.get(pk=team_id)
+                team.workers.add(join_request.from_user)
+                return redirect("task:project-detail", slug=join_request.project.slug)
+            join_request.status="R"
+            join_request.save()
+            return redirect("task:project-detail", slug=join_request.project.slug)
+        else:
+            raise PermissionDenied()
+        

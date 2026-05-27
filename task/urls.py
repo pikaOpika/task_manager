@@ -9,7 +9,8 @@ from .views import (
     TeamListView, TeamDetailView,
     TeamCreateView, TeamUpdateView, TeamDeleteView,
     ProjectListView, ProjectDetailView,
-    ProjectCreateView, ProjectUpdateView, ProjectDeleteView
+    ProjectCreateView, ProjectUpdateView, ProjectDeleteView,
+    JoinRequestCreateView, JoinRequestReviewView
 )
 
 app_name = 'task'
@@ -43,4 +44,7 @@ urlpatterns = [
     path('projects/update/<slug:slug>/', ProjectUpdateView.as_view(), name="project-update"),
     path('projects/delete/<slug:slug>/', ProjectDeleteView.as_view(), name="project-delete"),
     path('projects/<slug:slug>/', ProjectDetailView.as_view(), name="project-detail"),
+    # Join Request
+    path('projects/<slug:slug>/join/',JoinRequestCreateView.as_view(), name="join-request-create"),
+    path('join-requests/<int:pk>/review/',JoinRequestReviewView.as_view(), name="join-request-review"),
 ]

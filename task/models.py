@@ -118,3 +118,21 @@ class Team(models.Model):
         if not self.slug:
             self.slug = slugify(f"team-{uuid.uuid4()}")
         super().save(*args, **kwargs)
+
+
+class JoinRequest(models.Model):
+    class Status(models.TextChoices):
+        pending = "P", "Pending"
+        approved = "A", "Approved"
+        rejected = "R", "Rejected"
+
+
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="requests")
+    from_user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="requests")
+    status = models.CharField(max_length=1, choices=Status, default=Status.pending)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["project", "from_user"], name="unique_request")
+        ]
