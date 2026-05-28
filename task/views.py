@@ -8,8 +8,8 @@ from django.core.exceptions import PermissionDenied
 from django.db.models import Count, Q
 
 
-from .models import Task, Position, Project, Team, JoinRequest
-from .forms import (
+from task.models import Task, Position, Project, Team, JoinRequest
+from task.forms import (
     WorkerForm, WorkerUpdateForm, WorkerSearchForm,
     TaskSearchForm, TaskForm, TaskUpdateForm
 )

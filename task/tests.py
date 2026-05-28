@@ -1,8 +1,8 @@
 from django.test import TestCase
 from django.urls import reverse
 
-from .models import TaskType, Task, Worker, Position, Project
-from .forms import WorkerUpdateForm
+from task.models import TaskType, Task, Worker, Position, Project
+from task.forms import WorkerUpdateForm
 
 
 class TaskTypeModelTest(TestCase):
