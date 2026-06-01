@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import get_user_model
 
-from .models import Position, Task
+from task.models import Position, Task
 
 class WorkerForm(UserCreationForm):
     position = forms.ModelChoiceField(queryset=Position.objects.all())
