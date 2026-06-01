@@ -2,6 +2,14 @@
 
 A task management web application built with Django. Organize teams, track tasks, and manage projects.
 
+## Live Demo
+
+**[https://task-manager-l6et.onrender.com](https://task-manager-l6et.onrender.com)**
+
+> Demo admin account:
+> - Username: `user`
+> - Password: `user12345`
+
 ## Features
 
 - Task creation with priority, deadline, and assignees
